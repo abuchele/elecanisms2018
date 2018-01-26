@@ -36,14 +36,16 @@ int16_t main(void) {
     T1CONbits.TON = 1;      // turn on Timer1
 
     LED2 = ON;
+    LED3 = ON;
 
     while (1) {
         if (IFS0bits.T1IF == 1) {
             IFS0bits.T1IF = 0;      // lower Timer1 interrupt flag
-            LED2 = !LED2;           // toggle LED2
+            LED2 = !LED2;           // toggle 
+            LED3 = !LED3;           // toggle LED2
         }
-        LED1 = (SW2 == 0) ? ON : OFF;   // turn LED1 on if SW2 is pressed 
-        LED3 = (SW3 == 0) ? ON : OFF;   // turn LED3 on if SW3 is pressed
+        
+        LED1 = (D0 == 0) ? OFF : ON;   // turn LED3 on if SW3 is pressed
     }
 }
 
