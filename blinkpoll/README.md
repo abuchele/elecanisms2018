@@ -1,6 +1,6 @@
 #Elecanisms 2018 Miniproject 0
 
-Anna Buchele
+###Anna Buchele
 
 ##Circuit Directions
 
