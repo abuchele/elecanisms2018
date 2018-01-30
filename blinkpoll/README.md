@@ -1,10 +1,13 @@
 #Elecanisms 2018 Miniproject 0
+
 Anna Buchele
 
 ##Circuit Directions
+
 To run this project, first build a circuit: Connect a switch on one side to Vout, and connect the other side to an input going to D0, as well as a pull-down resistor connected to ground. 
 
 ##Running the Project
+
 Navigate to the elecanisms2018/blinkpoll directory in terminal. Run scons. This should generate a hex file to write to the board. 
 
 In order to put the board in bootloader mode, press and hold the red button, then press and hold the black button, then release the red button, and finally release the black button. 
