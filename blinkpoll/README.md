@@ -1,12 +1,12 @@
-#Elecanisms 2018 Miniproject 0
+# Elecanisms 2018 Miniproject 0
 
-###Anna Buchele
+### Anna Buchele
 
-##Circuit Directions
+## Circuit Directions
 
 To run this project, first build a circuit: Connect a switch on one side to Vout, and connect the other side to an input going to D0, as well as a pull-down resistor connected to ground. 
 
-##Running the Project
+## Running the Project
 
 Navigate to the elecanisms2018/blinkpoll directory in terminal. Run scons. This should generate a hex file to write to the board. 
 
