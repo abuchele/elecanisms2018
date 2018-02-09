@@ -1,0 +1,7 @@
+*.pyc
+*.lst
+*.hex
+*.o
+*.ipynb
+*.dblite
+*.elf
