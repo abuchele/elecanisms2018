@@ -92,7 +92,7 @@ class encodertest:
     	f = open("test_data_attachment.csv",'w')
     	starttime = time.time()
     	for i in range (5000):
-    		f.write(str('{:05d}'.format(self.get_angle())) + ',' + str(time.time()-starttime) + ';')
+    		f.write(str('{:d}'.format(self.get_angle())) + ',' + str(time.time()-starttime) + ';')
     		f.write('\n')
     		time.sleep(0.0005)
 
