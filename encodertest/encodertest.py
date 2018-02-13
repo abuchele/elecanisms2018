@@ -13,6 +13,9 @@ class encodertest:
         self.READ_SW3 = 5
         self.ENC_READ_REG = 6
         self.dev = usb.core.find(idVendor = 0x6666, idProduct = 0x0003)
+        self.startangle = 0
+        self.prev_angle = 0
+        self.total_angle = 0
         if self.dev is None:
             raise ValueError('no USB device found matching idVendor = 0x6666 and idProduct = 0x0003')
         self.dev.set_configuration()
@@ -88,6 +91,12 @@ class encodertest:
         else:
             return (int(ret[0]) + 256 * int(ret[1])) & 0x3FFF
 
+    def get_angle_trans_int(self):
+    	angle_raw = int(self.get_angle())
+    	angle_out = int(angle_raw)
+    	angle_out =-0.0221*angle_out + 361
+    	return angle_out
+
     def record_angle(self):
     	f = open("test_data_attachment.csv",'w')
     	starttime = time.time()
@@ -96,6 +105,19 @@ class encodertest:
     		f.write('\n')
     		time.sleep(0.0005)
 
+    def get_delta_angle(self):
+    	curr_angle = self.get_angle_trans_int()
+    	delta_angle = curr_angle - self.prev_angle
+    	self.total_angle = self.total_angle + delta_angle
+    	self.prev_angle = curr_angle
+    	return delta_angle
+    	
+
+
+
 if __name__ == '__main__':
 	Encoder = encodertest()
-	Encoder.record_angle()
+	#Encoder.record_angle()
+	while True:
+		print Encoder.get_delta_angle()
+		time.sleep(0.0005)
