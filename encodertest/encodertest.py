@@ -88,4 +88,14 @@ class encodertest:
         else:
             return (int(ret[0]) + 256 * int(ret[1])) & 0x3FFF
 
+    def record_angle(self):
+    	f = open("test_data_attachment.csv",'w')
+    	starttime = time.time()
+    	for i in range (5000):
+    		f.write(str('{:05d}'.format(self.get_angle())) + ',' + str(time.time()-starttime) + ';')
+    		f.write('\n')
+    		time.sleep(0.0005)
 
+if __name__ == '__main__':
+	Encoder = encodertest()
+	Encoder.record_angle()

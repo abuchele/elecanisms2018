@@ -47,7 +47,7 @@ class encodertestgui:
             self.sw2_status.pack(side = tk.TOP)
             self.sw3_status = tk.Label(self.root, text = 'SW3 is currently ?')
             self.sw3_status.pack(side = tk.TOP)
-            self.enc_status = tk.Label(self.root, text = 'Anlge is ?????')
+            self.enc_status = tk.Label(self.root, text = 'Angle is ?????')
             self.enc_status.pack(side = tk.TOP)
             self.update_status()
 
