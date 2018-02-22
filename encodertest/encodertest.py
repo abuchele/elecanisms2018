@@ -108,9 +108,17 @@ class encodertest:
     def get_delta_angle(self):
     	curr_angle = self.get_angle_trans_int()
     	delta_angle = curr_angle - self.prev_angle
+        if (delta_angle > 100):
+            delta_angle = delta_angle - 360
+        elif (delta_angle < -100):
+            delta_angle = delta_angle + 360
     	self.total_angle = self.total_angle + delta_angle
     	self.prev_angle = curr_angle
     	return delta_angle
+
+    def track_angle(self):
+        self.total_angle = float(self.total_angle) + self.get_delta_angle()
+        return self.total_angle
     	
 
 
@@ -119,5 +127,5 @@ if __name__ == '__main__':
 	Encoder = encodertest()
 	#Encoder.record_angle()
 	while True:
-		print Encoder.get_delta_angle()
+		print Encoder.track_angle()
 		time.sleep(0.0005)

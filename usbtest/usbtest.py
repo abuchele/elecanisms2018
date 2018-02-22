@@ -130,6 +130,6 @@ class usbtest:
 if __name__ == '__main__':
     usbtest_inst = usbtest()
     while True:
-        usbtest_inst.set_duty_val(50)
-        print usbtest_inst.get_duty_val()
+        usbtest_inst.set_duty(50)
+        print usbtest_inst.get_duty()
 
