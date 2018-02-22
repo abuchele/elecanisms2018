@@ -216,6 +216,7 @@ class usbencodertest:
 			delta_angle = delta_angle + 360
 		self.total_angle = self.total_angle + delta_angle
 		self.prev_angle = curr_angle
+		self.delta_angle = delta_angle
 		return delta_angle
 
 	def track_angle(self):
@@ -227,11 +228,15 @@ if __name__ == '__main__':
 	usbtest_inst = usbencodertest()
 	i = 1
 	while True:
+		# forward_input = input("Forward speed:")
+		# rev_input = input("Rev speed:")
+		# usbtest_inst.set_duty(forward_input)
+		# usbtest_inst.set_duty_rev(rev_input)
+		# time.sleep(1)
+		# try:
+		# 	input("clear?")
+		# except:
+		# 	pass
 		usbtest_inst.set_duty(0)
-		usbtest_inst.set_duty_rev(50)
-		time.sleep(1)
-		# print usbtest_inst.track_angle()
-		# time.sleep(0.0005)
-		# i = i + 1
-		# if (i > 99):
-		# 	i = -99
+		usbtest_inst.set_duty_rev(0)
+		print usbtest_inst.track_angle()
