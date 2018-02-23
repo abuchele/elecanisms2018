@@ -46,10 +46,6 @@ class usbencodertest:
 		self.GET_DUTY_VAL_REV = 12
 		self.GET_DUTY_MAX_REV = 13
 
-		self.startangle = 0
-		self.prev_angle = 0
-		self.total_angle = 0
-
 		self.dev = usb.core.find(idVendor = 0x6666, idProduct = 0x0003)
 		if self.dev is None:
 			raise ValueError('no USB device found matching idVendor = 0x6666 and idProduct = 0x0003')
@@ -64,6 +60,11 @@ class usbencodertest:
 		self.ENC_DIAG_AND_AUTO_GAIN_CTRL = 0x3FFD
 		self.ENC_MAGNITUDE = 0x3FFE
 		self.ENC_ANGLE_AFTER_ZERO_POS_ADDER = 0x3FFF
+
+		
+		self.startangle = 0
+		self.prev_angle = self.get_angle_trans_int()
+		self.total_angle = 0
 
 
 	def close(self):
