@@ -16,10 +16,12 @@ import time
 
 
 MOTOR_SLEEP_TIME = 0.000001 # Amount of time to wait after writing to motor
-SLOW_MOTOR_SPEED = 10
+SLOW_MOTOR_SPEED = 20
 
 forward_direction = 1
 reverse_direction = -1
+
+DELTA_ANGLE_THRESH = 0.01
 
 
 class user_functions:
@@ -30,10 +32,18 @@ class user_functions:
 		self.max_angle = 800
 		self.clear_motor()
 		self.direction = 0
+		self.motor_direction = 0
+		self.motor_speed = 0
 
 	def update_vals(self):
 		self.angle = self.joystick.track_angle()
 		self.del_angle = self.joystick.delta_angle
+		if self.del_angle > DELTA_ANGLE_THRESH:
+			self.direction = 1
+		elif self.del_angle < -DELTA_ANGLE_THRESH:
+			self.direction = -1
+		else:
+			self.direction = 0
 		self.a0 = self.joystick.read_a0()
 
 	def write_motor(self,forward,backward):
@@ -43,15 +53,27 @@ class user_functions:
 		time.sleep(MOTOR_SLEEP_TIME)
 
 	def write_forward(self,val):
-		self.clear_motor()
+		if (self.motor_direction == 1):
+			pass
+		elif (self.motor_direction == -1):
+			self.clear_motor()
 		self.write_motor(val,0)
+		self.motor_direction = 1
+		self.motor_speed = val
 
 	def write_backward(self,val):
-		self.clear_motor()
+		if (self.motor_direction == -1):
+			pass
+		elif (self.motor_direction == 1):
+			self.clear_motor()
 		self.write_motor(0,val)
+		self.motor_direction = -1
+		self.motor_speed = val
 
 	def clear_motor(self):
 		self.write_motor(0,0)
+		self.motor_direction = 0
+		self.motor_speed = 0
 
 	def run_0(self):
 		intended_direction = 0
@@ -96,12 +118,21 @@ class user_functions:
 						print 7
 			print self.angle
 
+	def run_2(self):
+		while True:
+			self.update_vals()
+			if (self.direction == 1):
+				self.write_backward(SLOW_MOTOR_SPEED)
+				print 1
+			elif (self.direction == -1):
+				self.write_forward(SLOW_MOTOR_SPEED)
+				print 2
 
 		
 
 
 	def run(self):
-		self.run_0()
+		self.run_2()
 		#self.clear_motor()
 		#self.write_forward(SLOW_MOTOR_SPEED)
 		# try:
