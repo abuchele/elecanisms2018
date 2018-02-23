@@ -13,6 +13,7 @@ Mode 5 - Virtual Wall
 
 from usbencodertest import usbencodertest
 import time
+import cv2
 
 
 MOTOR_SLEEP_TIME = 0.000001 # Amount of time to wait after writing to motor
@@ -21,7 +22,9 @@ SLOW_MOTOR_SPEED = 20
 forward_direction = 1
 reverse_direction = -1
 
-DELTA_ANGLE_THRESH = 0.01
+DELTA_ANGLE_THRESH = 0.5
+
+BASE_MOTOR_SPEED = 20
 
 
 class user_functions:
@@ -34,14 +37,17 @@ class user_functions:
 		self.direction = 0
 		self.motor_direction = 0
 		self.motor_speed = 0
+		self.del_angle = 0
+		self.joystick.delta_angle = 0
+		self.intended_direction = 0
 
 	def update_vals(self):
 		self.angle = self.joystick.track_angle()
 		self.del_angle = self.joystick.delta_angle
 		if self.del_angle > DELTA_ANGLE_THRESH:
-			self.direction = 1
-		elif self.del_angle < -DELTA_ANGLE_THRESH:
 			self.direction = -1
+		elif self.del_angle < -DELTA_ANGLE_THRESH:
+			self.direction = 1
 		else:
 			self.direction = 0
 		self.a0 = self.joystick.read_a0()
@@ -76,63 +82,52 @@ class user_functions:
 		self.motor_speed = 0
 
 	def run_0(self):
-		intended_direction = 0
-		while True:
-			self.update_vals()
-			if intended_direction:
-				if self.angle < self.min_angle:
-					if (self.direction == 1):
-						intended_direction = 0
-						print 0
-					else:
-						self.write_forward(SLOW_MOTOR_SPEED)
-						self.direction = 1
-						intended_direction = 0
-						print 1
-				else:
-					if (self.direction == -1):
-						self.write_backward(SLOW_MOTOR_SPEED)
-						print 2
-					else:
-						self.write_backward(SLOW_MOTOR_SPEED)
-						self.direction = -1
-						print 3
-			else:
-				if self.angle > self.max_angle:
-					if (self.direction == -1):
-						intended_direction = 1
-						print 4
-					else:
-						self.write_backward(SLOW_MOTOR_SPEED)
-						self.direction = -1
-						intended_direction = 1
-						print 5
-				else:
-					if (self.direction == 1):
-						print 6
-						self.write_forward(SLOW_MOTOR_SPEED)
-						pass
-					else:
-						self.write_forward(SLOW_MOTOR_SPEED)
-						self.direction = 1
-						print 7
-			print self.angle
-
-	def run_2(self):
-		while True:
-			self.update_vals()
-			if (self.direction == 1):
+		if (self.intended_direction == 1):
+			if self.angle > self.max_angle:
+				self.intended_direction = -1
 				self.write_backward(SLOW_MOTOR_SPEED)
 				print 1
-			elif (self.direction == -1):
+			else:
 				self.write_forward(SLOW_MOTOR_SPEED)
 				print 2
+		else:
+			if self.angle < self.min_angle:
+				self.intended_direction = 1
+				self.write_forward(SLOW_MOTOR_SPEED)
+				print 3
+			else:
+				self.write_backward(SLOW_MOTOR_SPEED)
+				print 4
 
-		
+	def run_2(self):
+		motor_speed = BASE_MOTOR_SPEED + (self.del_angle*10)
+		if (self.direction == 1):
+			self.write_backward(motor_speed)
+			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+			print 1
+		elif (self.direction == -1):
+			self.write_forward(motor_speed)
+			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+			print 2
 
+
+	def run_cycle(self,mode):
+		self.update_vals()
+		try:
+			if (mode == 0):
+				self.run_0()
+			elif (mode == 1):
+				pass
+				#self.run_1()
+			elif (mode == 2):
+				self.run_2()
+		except KeyboardInterrupt:
+			self.clear_motor()
+			break
 
 	def run(self):
-		self.run_2()
+		while True:
+			self.run_cycle(2)
 		#self.clear_motor()
 		#self.write_forward(SLOW_MOTOR_SPEED)
 		# try:
@@ -150,6 +145,8 @@ class user_functions:
 		# 		self.run_2()
 		# 	elif self.mode == 3:
 		# 		self.run_3()
+
+
 
 
 		
