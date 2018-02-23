@@ -5,7 +5,7 @@ Mode 1 - Virtual spring
 Mode 2 - Virtual Damper
 Mode 3 - Virtual Texture: Stick
 Mode 4 - Virtual Texture: Slip
-Mode 5 - Virtual Wall 
+Mode 5 - Virtual Wall
 
 
 """
@@ -31,7 +31,7 @@ class user_functions:
 	def __init__(self):
 		self.joystick = usbencodertest()
 		self.mode = 0
-		self.min_angle = -800 
+		self.min_angle = -800
 		self.max_angle = 800
 		self.clear_motor()
 		self.direction = 0
@@ -110,6 +110,23 @@ class user_functions:
 			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
 			print 2
 
+	def run_wall(self):
+		#variables for the wallsides.  stop is the outer limit, thresh is
+		#the point where it starts to bounce you back.
+		left_thresh = self.min_angle + 100
+
+		right_thresh = self.max_angle - 100
+		while True:
+			self.update_vals
+
+			if left_thresh < self.angle < right_thresh:
+				#Normal base case, don't do anything
+				pass
+			elif self.angle < left_thresh:
+				self.write_forward(100)
+			elif self.angle > right_thresh:
+				self.write_backward(100)
+
 
 	def run_cycle(self,mode):
 		self.update_vals()
@@ -148,8 +165,6 @@ class user_functions:
 
 
 
-
-		
 if __name__ == '__main__':
 	joystick = user_functions()
 	joystick.run()
