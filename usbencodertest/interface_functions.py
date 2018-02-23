@@ -118,6 +118,18 @@ class user_functions:
 						print 7
 			print self.angle
 
+	def run_1(self):
+		MOTOR_SPEED = 0
+		while True:
+			self.update_vals()
+			MOTOR_SPEED = 0.0323*self.angle - 15.806
+			if (self.direction == 1):
+				self.write_backward(MOTOR_SPEED)
+				print 1
+			elif (self.direction == -1):
+				self.write_forward(MOTOR_SPEED)
+				print 2
+
 	def run_2(self):
 		while True:
 			self.update_vals()
