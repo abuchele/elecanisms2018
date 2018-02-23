@@ -228,15 +228,15 @@ if __name__ == '__main__':
 	usbtest_inst = usbencodertest()
 	i = 1
 	while True:
-		# forward_input = input("Forward speed:")
-		# rev_input = input("Rev speed:")
-		# usbtest_inst.set_duty(forward_input)
-		# usbtest_inst.set_duty_rev(rev_input)
-		# time.sleep(1)
-		# try:
-		# 	input("clear?")
-		# except:
-		# 	pass
+		forward_input = input("Forward speed:")
+		rev_input = input("Rev speed:")
+		usbtest_inst.set_duty(forward_input)
+		usbtest_inst.set_duty_rev(rev_input)
+		time.sleep(1)
+		try:
+			input("clear?")
+		except:
+			pass
 		usbtest_inst.set_duty(0)
 		usbtest_inst.set_duty_rev(0)
-		print usbtest_inst.track_angle()
+		# print usbtest_inst.track_angle()
