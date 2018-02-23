@@ -129,15 +129,22 @@ class user_functions:
 				print 2
 
 	def run_wall(self):
-		#variables for the wallsides.  Outer is the outer limit, inner is
+		#variables for the wallsides.  stop is the outer limit, thresh is
 		#the point where it starts to bounce you back.
-		left_outer = self.min_angle
-		left_inner = self.min_angle + 100
-		right_outer = self.max_angle
-		right_inner = self.max_angle - 100
+		left_thresh = self.min_angle + 100
+
+		right_thresh = self.max_angle - 100
 		while True:
 			self.update_vals
-			
+
+			if left_thresh < self.angle < right_thresh:
+				#Normal base case, don't do anything
+				pass
+			elif self.angle < left_thresh:
+				self.write_forward(100)
+			elif self.angle > right_thresh:
+				self.write_backward(100)
+
 
 
 
