@@ -61,6 +61,7 @@ class user_functions:
 		self.motor_speed = 0
 		self.del_angle = 0
 		self.joystick.delta_angle = 0
+		self.on_wall = False
 
 	def update_vals(self):
 		""" Should be called each cycle. Updates class variables with new values. 
@@ -82,7 +83,7 @@ class user_functions:
 		self.joystick.set_duty(forward)
 		self.joystick.set_duty_rev(backward)
 		self.curr_drive = [forward,backward]
-		time.sleep(MOTOR_SLEEP_TIME)
+		#time.sleep(MOTOR_SLEEP_TIME)
 
 	def write_forward(self,val):
 		""" Writes the set duty cycle to the motor in the forward direction. Val should be between 0-100. 
@@ -136,6 +137,8 @@ class user_functions:
 				print 4
 
 	def run_1(self):
+		""" Run program 1: move the paddle in the virtual spring configuration. 
+		"""
 		MOTOR_SPEED = 0
 		while True:
 			self.update_vals()
@@ -150,7 +153,7 @@ class user_functions:
 	def run_2(self):
 		""" Run program 2: move the paddle in the virtual damper configuration. 
 		"""
-		motor_speed = BASE_MOTOR_SPEED + (self.del_angle*10)
+		motor_speed = BASE_MOTOR_SPEED 
 		if (self.direction == 1):
 			self.write_backward(motor_speed)
 			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
@@ -160,33 +163,62 @@ class user_functions:
 			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
 			print 2
 
-	def run_5(self):
+	def run_3(self):
+		""" Run program 3: move the paddle in a slip configuration. 
+		"""
+		motor_speed = BASE_MOTOR_SPEED 
+		if (self.direction == -1):
+			self.write_backward(motor_speed)
+			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+		elif (self.direction == 1):
+			self.write_forward(motor_speed)
+			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+
+	def run_4(self):
+		""" Run program 4: move the paddle in a stick configuration. 
+		"""
+		motor_speed = BASE_MOTOR_SPEED 
+		if (self.direction == 1):
+			self.write_backward(motor_speed)
+			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+		elif (self.direction == -1):
+			self.write_forward(motor_speed)
+			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+
+
+	def run_5(self, left_thresh = self.min_angle + 100, right_thresh = self.max_angle - 100):
 		""" Run program 5: wall configuration. 
 		"""
-		#variables for the wallsides.  stop is the outer limit, thresh is
-		#the point where it starts to bounce you back.
-		left_thresh = self.min_angle + 100
-
-		right_thresh = self.max_angle - 100
 		if left_thresh < self.angle < right_thresh:
-			#Normal base case, don't do anything
-			pass
+			if self.on_wall:
+				self.clear_motor()
+				self.on_wall = False
 		elif self.angle < left_thresh:
 			self.write_forward(100)
+			self.on_wall = True
 		elif self.angle > right_thresh:
 			self.write_backward(100)
+			self.on_wall = True
 
 
-	def run_cycle(self,mode):
+	def run_cycle(self,mode, input_val_1 = None, input_val_2 = None):
+		""" Run a single cycle in the selected mode."""
 		self.update_vals()
 		try:
 			if (mode == 0):
 				self.run_0()
 			elif (mode == 1):
-				pass
-				#self.run_1()
+				self.run_1()
 			elif (mode == 2):
 				self.run_2()
+			elif (mode == 3):
+				pass
+				#self.run_3()
+			elif (mode == 4):
+				pass
+				#self.run_4()
+			elif (mode == 5):
+				self.run_5(input_val_1,input_val_2)
 		except KeyboardInterrupt:
 			self.clear_motor()
 			break
