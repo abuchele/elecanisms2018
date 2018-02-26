@@ -135,6 +135,18 @@ class user_functions:
 				self.write_backward(SLOW_MOTOR_SPEED)
 				print 4
 
+	def run_1(self):
+		MOTOR_SPEED = 0
+		while True:
+			self.update_vals()
+			MOTOR_SPEED = 0.0323*self.angle - 15.806
+			if (self.direction == 1):
+				self.write_backward(MOTOR_SPEED)
+				print 1
+			elif (self.direction == -1):
+				self.write_forward(MOTOR_SPEED)
+				print 2
+
 	def run_2(self):
 		""" Run program 2: move the paddle in the virtual damper configuration. 
 		"""
