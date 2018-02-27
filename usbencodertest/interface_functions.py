@@ -13,7 +13,6 @@ Mode 5 - Virtual Wall
 
 from usbencodertest import usbencodertest
 import time
-import cv2
 
 
 MOTOR_SLEEP_TIME = 0.000001 # Amount of time to wait after writing to motor
@@ -22,9 +21,9 @@ SLOW_MOTOR_SPEED = 20
 forward_direction = 1
 reverse_direction = -1
 
-DELTA_ANGLE_THRESH = 0.5
+DELTA_ANGLE_THRESH = .75
 
-BASE_MOTOR_SPEED = 20
+BASE_MOTOR_SPEED = 40
 
 """ Direction key:
 
@@ -83,7 +82,7 @@ class user_functions:
 		self.joystick.set_duty(forward)
 		self.joystick.set_duty_rev(backward)
 		self.curr_drive = [forward,backward]
-		#time.sleep(MOTOR_SLEEP_TIME)
+		time.sleep(MOTOR_SLEEP_TIME)
 
 	def write_forward(self,val):
 		""" Writes the set duty cycle to the motor in the forward direction. Val should be between 0-100. 
@@ -115,6 +114,10 @@ class user_functions:
 		self.write_motor(0,0)
 		self.motor_direction = 0
 		self.motor_speed = 0
+
+	def run_calibration(self):
+		""" Prints the current angle so we can calibrate the system to be centered at angle = 0. """
+		print self.angle
 
 	def run_0(self):
 		""" Run program 0: move the paddle back and forth to its edges. 
@@ -154,41 +157,54 @@ class user_functions:
 		""" Run program 2: move the paddle in the virtual damper configuration. 
 		"""
 		motor_speed = BASE_MOTOR_SPEED 
-		if (self.direction == 1):
-			self.write_backward(motor_speed)
-			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
-			print 1
-		elif (self.direction == -1):
-			self.write_forward(motor_speed)
-			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
-			print 2
+		if ((self.angle > self.max_angle) or (self.angle < self.min_angle)):
+			self.clear_motor()
+		else:
+			if (self.direction == 1):
+				self.write_backward(motor_speed)
+				print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+				print 1
+			elif (self.direction == -1):
+				self.write_forward(motor_speed)
+				print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+				print 2
 
 	def run_3(self):
 		""" Run program 3: move the paddle in a slip configuration. 
 		"""
 		motor_speed = BASE_MOTOR_SPEED 
-		if (self.direction == -1):
-			self.write_backward(motor_speed)
-			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
-		elif (self.direction == 1):
-			self.write_forward(motor_speed)
-			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+		if ((self.angle > self.max_angle) or (self.angle < self.min_angle)):
+			self.clear_motor()
+		else:
+			if (self.direction == -1):
+				self.write_backward(motor_speed)
+				print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+			elif (self.direction == 1):
+				self.write_forward(motor_speed)
+				print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
 
 	def run_4(self):
 		""" Run program 4: move the paddle in a stick configuration. 
 		"""
 		motor_speed = BASE_MOTOR_SPEED 
-		if (self.direction == 1):
-			self.write_backward(motor_speed)
-			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
-		elif (self.direction == -1):
-			self.write_forward(motor_speed)
-			print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+		if ((self.angle > self.max_angle) or (self.angle < self.min_angle)):
+			self.clear_motor()
+		else:
+			if (self.direction == 1):
+				self.write_backward(motor_speed)
+				print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+				print 1
+			elif (self.direction == -1):
+				self.write_forward(motor_speed)
+				print ("direction: %d, motor_direction: %d, delta_angle: %f" % (self.direction,self.motor_direction,self.del_angle))
+				print 2
 
 
-	def run_5(self, left_thresh = self.min_angle + 100, right_thresh = self.max_angle - 100):
+	def run_5(self, left_thresh, right_thresh):
 		""" Run program 5: wall configuration. 
 		"""
+		if ((self.angle > self.max_angle) or (self.angle < self.min_angle)):
+			self.clear_motor()
 		if left_thresh < self.angle < right_thresh:
 			if self.on_wall:
 				self.clear_motor()
@@ -201,31 +217,77 @@ class user_functions:
 			self.on_wall = True
 
 
-	def run_cycle(self,mode, input_val_1 = None, input_val_2 = None):
+	def run_cycle(self, mode, input_val_1 = None, input_val_2 = None):
 		""" Run a single cycle in the selected mode."""
 		self.update_vals()
 		try:
 			if (mode == 0):
-				self.run_0()
+				try:
+					self.run_0()
+				except KeyboardInterrupt:
+					self.clear_motor()
 			elif (mode == 1):
-				self.run_1()
+				try:
+					self.run_1()
+				except KeyboardInterrupt:
+					self.clear_motor()
 			elif (mode == 2):
-				self.run_2()
+				try:
+					self.run_2()
+					time.sleep(10*MOTOR_SLEEP_TIME)
+					self.clear_motor()
+					time.sleep(MOTOR_SLEEP_TIME)
+				except KeyboardInterrupt:
+					self.clear_motor()
 			elif (mode == 3):
-				pass
-				#self.run_3()
+				try:
+					self.run_3()
+				except KeyboardInterrupt:
+					self.clear_motor()
 			elif (mode == 4):
-				pass
-				#self.run_4()
+				try:
+					self.run_4()
+					time.sleep(4*MOTOR_SLEEP_TIME)
+					self.clear_motor()
+					time.sleep(2*MOTOR_SLEEP_TIME)
+				except KeyboardInterrupt:
+					self.clear_motor()
 			elif (mode == 5):
-				self.run_5(input_val_1,input_val_2)
+				try:
+					self.run_5(input_val_1,input_val_2)
+				except KeyboardInterrupt:
+					self.clear_motor()
+			elif (mode == -1):
+				try:
+					self.run_calibration()
+				except KeyboardInterrupt:
+					self.clear_motor()
 		except KeyboardInterrupt:
 			self.clear_motor()
-			break
+				
+
+	def run_stick_cycle(self):
+		self.run_cycle(4)
+		time.sleep(4*MOTOR_SLEEP_TIME)
+		self.clear_motor()
+		time.sleep(2*MOTOR_SLEEP_TIME)
+
+	def run_slip_cycle(self):
+		self.run_cycle(3)
+		time.sleep(4*MOTOR_SLEEP_TIME)
+		self.clear_motor()
+		time.sleep(MOTOR_SLEEP_TIME)
+
 
 	def run(self):
 		while True:
-			self.run_cycle(2)
+			try:
+				self.run_cycle(5, -400, 400)
+				#self.run_cycle(-1)
+				#self.run_slip_cycle()
+			except KeyboardInterrupt:
+				self.clear_motor()
+				break
 		#self.clear_motor()
 		#self.write_forward(SLOW_MOTOR_SPEED)
 		# try:
