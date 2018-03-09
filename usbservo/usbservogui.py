@@ -47,6 +47,9 @@ class usbservogui:
             servo2_slider = tk.Scale(self.root, from_ = 0, to = 65535, orient = tk.HORIZONTAL, showvalue = tk.FALSE, command = self.set_servo2_callback)
             servo2_slider.set(32768)
             servo2_slider.pack(side = tk.TOP)
+            servo3_slider = tk.Scale(self.root, from_ = 0, to = 65535, orient = tk.HORIZONTAL, showvalue = tk.FALSE, command = self.set_servo3_callback)
+            servo3_slider.set(32768)
+            servo3_slider.pack(side = tk.TOP)
             self.sw1_status = tk.Label(self.root, text = 'SW1 is currently ?')
             self.sw1_status.pack(side = tk.TOP)
             self.sw2_status = tk.Label(self.root, text = 'SW2 is currently ?')
@@ -63,11 +66,16 @@ class usbservogui:
     def set_servo2_callback(self, value):
         self.dev.set_servo2(int(value))
 
+    def set_servo3_callback(self, value):
+        self.dev.set_servo3(int(value))
+
     def update_status(self):
+        curr_a0 = self.dev.read_a0()
         self.sw1_status.configure(text = 'SW1 is currently {!s}'.format(self.dev.read_sw1()))
         self.sw2_status.configure(text = 'SW2 is currently {!s}'.format(self.dev.read_sw2()))
         self.sw3_status.configure(text = 'SW3 is currently {!s}'.format(self.dev.read_sw3()))
-        self.a0_status.configure(text = 'A0 is currently {:04d}'.format(self.dev.read_a0()))
+        if curr_a0 is not None:
+            self.a0_status.configure(text = 'A0 is currently {:04d}'.format(curr_a0))
         self.update_job = self.root.after(50, self.update_status)
 
     def shut_down(self):

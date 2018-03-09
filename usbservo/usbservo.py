@@ -38,6 +38,7 @@ class usbservo:
         self.READ_A0 = 6 
         self.SET_SERVO1 = 7
         self.SET_SERVO2 = 8
+        self.SET_SERVO3 = 9
 
         self.dev = usb.core.find(idVendor = 0x6666, idProduct = 0x0003)
         if self.dev is None:
@@ -109,3 +110,8 @@ class usbservo:
         except usb.core.USBError:
             print "Could not send SET_SERVO2 vendor request."
 
+    def set_servo3(self, val):
+            try:
+                self.dev.ctrl_transfer(0x40, self.SET_SERVO3, val)
+            except usb.core.USBError:
+                print "Could not send SET_SERVO3 vendor request."
