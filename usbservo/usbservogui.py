@@ -50,6 +50,12 @@ class usbservogui:
             servo3_slider = tk.Scale(self.root, from_ = 0, to = 65535, orient = tk.HORIZONTAL, showvalue = tk.FALSE, command = self.set_servo3_callback)
             servo3_slider.set(32768)
             servo3_slider.pack(side = tk.TOP)
+            servo4_slider = tk.Scale(self.root, from_ = 0, to = 65535, orient = tk.HORIZONTAL, showvalue = tk.FALSE, command = self.set_servo4_callback)
+            servo4_slider.set(32768)
+            servo4_slider.pack(side = tk.TOP)
+            servo5_slider = tk.Scale(self.root, from_ = 0, to = 65535, orient = tk.HORIZONTAL, showvalue = tk.FALSE, command = self.set_servo5_callback)
+            servo5_slider.set(32768)
+            servo5_slider.pack(side = tk.TOP)
             self.sw1_status = tk.Label(self.root, text = 'SW1 is currently ?')
             self.sw1_status.pack(side = tk.TOP)
             self.sw2_status = tk.Label(self.root, text = 'SW2 is currently ?')
@@ -68,6 +74,12 @@ class usbservogui:
 
     def set_servo3_callback(self, value):
         self.dev.set_servo3(int(value))
+
+    def set_servo4_callback(self, value):
+        self.dev.set_servo4(int(value))
+
+    def set_servo5_callback(self, value):
+        self.dev.set_servo5(int(value))
 
     def update_status(self):
         curr_a0 = self.dev.read_a0()

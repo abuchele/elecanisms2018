@@ -38,6 +38,8 @@
 #define SET_SERVO1          7
 #define SET_SERVO2          8
 #define SET_SERVO3          9
+#define SET_SERVO4          10
+#define SET_SERVO5          11
 
 #define SERVO_MIN_WIDTH     900e-6
 #define SERVO_MAX_WIDTH     2.1e-3
@@ -104,6 +106,18 @@ void vendor_requests(void) {
             BD[EP0IN].bytecount = 0;
             BD[EP0IN].status = UOWN | DTS | DTSEN;
             break;
+        case SET_SERVO4:
+            servo_temp.ul = (uint32_t)USB_setup.wValue.w * (uint32_t)servo_multiplier;
+            OC4RS = servo_offset + servo_temp.w[1];
+            BD[EP0IN].bytecount = 0;
+            BD[EP0IN].status = UOWN | DTS | DTSEN;
+            break;
+        case SET_SERVO5:
+            servo_temp.ul = (uint32_t)USB_setup.wValue.w * (uint32_t)servo_multiplier;
+            OC5RS = servo_offset + servo_temp.w[1];
+            BD[EP0IN].bytecount = 0;
+            BD[EP0IN].status = UOWN | DTS | DTSEN;
+            break;
         default:
             USB_error_flags |= REQUEST_ERROR;
     }
@@ -129,6 +143,12 @@ int16_t main(void) {
     D11_DIR = OUT;      // configure D11 to be a digital output
     D11 = 0;            // set D11 low
 
+    D10_DIR = OUT;      // configure D10 to be a digital output
+    D10 = 0;            // set D10 low
+
+    D9_DIR = OUT;      // configure D9 to be a digital output
+    D9 = 0;            // set D9 low
+
     RPOR = (uint8_t *)&RPOR0;
     RPINR = (uint8_t *)&RPINR0;
 
@@ -136,7 +156,11 @@ int16_t main(void) {
     RPOR[D13_RP] = OC1_RP;  // connect the OC1 module output to pin D13
     RPOR[D12_RP] = OC2_RP;  // connect the OC2 module output to pin D12
     RPOR[D11_RP] = OC3_RP;  // connect the OC3 module output to pin D11
+    RPOR[D10_RP] = OC4_RP;  // connect the OC4 module output to pin D10
+    RPOR[D9_RP] = OC5_RP;  // connect the OC5 module output to pin D9
     __builtin_write_OSCCONL(OSCCON | 0x40);
+
+    //==============Servo 1==================
 
     OC1CON1 = 0x1C0F;   // configure OC1 module to use the peripheral
                         //   clock (i.e., FCY, OCTSEL<2:0> = 0b111),
@@ -151,6 +175,8 @@ int16_t main(void) {
     OC1R = 1;
     OC1TMR = 0;
 
+    //==============Servo 2==================
+
     OC2CON1 = 0x1C0F;   // configure OC2 module to use the peripheral
                         //   clock (i.e., FCY, OCTSEL<2:0> = 0b111),
                         //   TRIGSTAT = 1, and to operate in center-aligned 
@@ -164,6 +190,8 @@ int16_t main(void) {
     OC2R = 1;
     OC2TMR = 0;
 
+    //==============Servo 3==================
+
     OC3CON1 = 0x1C0F;   // configure OC3 module to use the peripheral
                         //   clock (i.e., FCY, OCTSEL<2:0> = 0b111),
                         //   TRIGSTAT = 1, and to operate in center-aligned 
@@ -176,6 +204,38 @@ int16_t main(void) {
     OC3RS = servo_offset + servo_temp.w[1];
     OC3R = 1;
     OC3TMR = 0;
+
+    //==============Servo 4==================
+
+    OC4CON1 = 0x1C0F;   // configure OC4 module to use the peripheral
+                        //   clock (i.e., FCY, OCTSEL<2:0> = 0b111),
+                        //   TRIGSTAT = 1, and to operate in center-aligned 
+                        //   PWM mode (OCM<2:0> = 0b111)
+    OC4CON2 = 0x008B;   // configure OC4 module to trigger from Timer1
+                        //   (OCTRIG = 1 and SYNCSEL<4:0> = 0b01011)
+
+    // set OC4 pulse width to 1.5ms (i.e. halfway between 0.9ms and 2.1ms)
+    servo_temp.ul = 0x8000 * (uint32_t)servo_multiplier;
+    OC4RS = servo_offset + servo_temp.w[1];
+    OC4R = 1;
+    OC4TMR = 0;
+
+    //==============Servo 5==================
+
+    OC5CON1 = 0x1C0F;   // configure OC5 module to use the peripheral
+                        //   clock (i.e., FCY, OCTSEL<2:0> = 0b111),
+                        //   TRIGSTAT = 1, and to operate in center-aligned 
+                        //   PWM mode (OCM<2:0> = 0b111)
+    OC5CON2 = 0x008B;   // configure OC5 module to trigger from Timer1
+                        //   (OCTRIG = 1 and SYNCSEL<4:0> = 0b01011)
+
+    // set OC5 pulse width to 1.5ms (i.e. halfway between 0.9ms and 2.1ms)
+    servo_temp.ul = 0x8000 * (uint32_t)servo_multiplier;
+    OC5RS = servo_offset + servo_temp.w[1];
+    OC5R = 1;
+    OC5TMR = 0;
+
+    //=======================================
 
     T1CON = 0x0010;     // configure Timer1 to have a period of 20ms
     PR1 = 0x9C3F;
